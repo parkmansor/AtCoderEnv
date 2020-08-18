@@ -1,0 +1,14 @@
+﻿2020/08/16 13:50:35 にビルドを開始しました。
+     1>ノード 2 上のプロジェクト "C:\Users\81905\Documents\Visual Studio 2013\Projects\atcoder\atcoder\atcoder.vcxproj" (Build ターゲット)。
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\boost_1_57_0 /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /wd4244 /analyze- /errorReport:prompt atcoder.cpp
+         atcoder.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\81905\Documents\Visual Studio 2013\Projects\atcoder\Debug\atcoder.exe" /INCREMENTAL /NOLOGO /LIBPATH:C:\boost_1_57_0 /LIBPATH:C:\boost_1_57_0\stage\x86_64\vc12\lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\81905\Documents\Visual Studio 2013\Projects\atcoder\Debug\atcoder.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\81905\Documents\Visual Studio 2013\Projects\atcoder\Debug\atcoder.lib" /MACHINE:X86 Debug\atcoder.obj
+         Debug\stdafx.obj
+         atcoder.vcxproj -> C:\Users\81905\Documents\Visual Studio 2013\Projects\atcoder\Debug\atcoder.exe
+     1>プロジェクト "C:\Users\81905\Documents\Visual Studio 2013\Projects\atcoder\atcoder\atcoder.vcxproj" (Build ターゲット) のビルドが完了しました。
+
+ビルドに成功しました。
+
+経過時間 00:00:00.70
