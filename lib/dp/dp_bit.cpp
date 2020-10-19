@@ -1,42 +1,47 @@
-int main()
+void Solve()
 {
-	int N, M;
-	cin >> N >> M;
+	ll N;
+	cin >> N;
 
-	vector<int> a(M), b(M);
-	vector<vector<int>> c(M);
-	REP(i, M) {
-		cin >> a[i] >> b[i];
-		REP(j, b[i]) {
-			int tmp; 
-			cin >> tmp;
-			tmp--;
-			c[i].emplace_back(tmp);
+	VL x(N), y(N), z(N);
+	REP(i, N) cin >> x[i] >> y[i] >> z[i];
+
+	VVL cost(N, VL(N));
+	REP(i, N) {
+		REP(j, N) {
+			ll costOne = abs(x[i] - x[j]) + abs(y[i] - y[j]) + max((ll)0, (z[j] - z[i]));
+			cost[i][j] = costOne;
 		}
 	}
 
-	int bitMax = 1 << N;
-	vector<vector<int>> dp(M + 1, vector<int>(bitMax, INF));
-	dp[0][0] = 0;
-	REP(i, M) {
-		int bitPtn = 0;
-		for (auto one : c[i]) {
-			bitPtn |= (0x1 << one);
+	ll bitMax = (ll)1 << N;
+	static ll dp[200000][20];
+	REP(i, bitMax + 1) {
+		REP(j, N + 1) {
+			dp[i][j] = INF;
 		}
+	}
 
-		REP(j, bitMax) {
-			if (dp[i][j] != INF) {
-				int nextBitPtn = j | bitPtn;
-				dp[i + 1][j] = min(dp[i + 1][j], dp[i][j]);
-				dp[i + 1][nextBitPtn] = min(dp[i + 1][nextBitPtn], dp[i][j] + a[i]);
+	dp[0][0] = 0;
+	REP(bitCnt, bitMax) {
+		REP(i, N) {
+			ll nowCost = dp[bitCnt][i];
+			if (nowCost == INF) continue;
+			REP(j, N) {
+				if (i == j) continue;
+				ll bitPtn = (ll)1 << j;
+				ll nextBitPtn = bitCnt | bitPtn;
+				ll nextCost = nowCost + cost[i][j];
+				dp[nextBitPtn][j] = min(dp[nextBitPtn][j], nextCost);
 			}
 		}
 	}
-
-	if (dp[M][bitMax - 1] == INF) {
-		cout << -1 << endl;
-	} else {
-		cout << dp[M][bitMax - 1] << endl;
+	
+	ll ans = dp[bitMax - 1][0];
+	REP(j, N) {
+		ll nextCost = dp[bitMax - 1][j] + cost[j][0];
+		ans = min(ans, nextCost);
 	}
-	return 0;
+
+	cout << ans << endl;
 }
