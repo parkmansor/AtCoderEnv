@@ -91,7 +91,7 @@ ll CombinationSum(ll n)
 		ll sum = 1;
 		for (ll j = 0; j < i; j++) {
 			sum *= (n - j);
-			sum /= (i - j);
+			sum /= (1 + j);
 		}
 		ans += sum;
 	}
