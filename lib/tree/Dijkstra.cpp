@@ -22,13 +22,14 @@ public:
 	//	vector<int> pathList;
  
 	vector<ll> pathRev;
+	const ll inf = 1e15;
  
 public:
 	template<class E>
 	Dijkstra(const Graph<E> &G, int startFrom)
 	{
 		int V = (int)G.size();
-		res = vector<ll>(V, INF);
+		res = vector<ll>(V, inf);
 		pathRev.resize(V, -1);
  
 		using P = pair<ll, int>;
