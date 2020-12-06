@@ -1,4 +1,3 @@
-
 // 枝定義
 struct Edge
 {
