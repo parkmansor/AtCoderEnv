@@ -1,77 +1,28 @@
-#include "stdafx.h"
-#include <iostream>
-#include <set>
-#include <queue>
-#include <vector>
-#include <algorithm>
-#include <math.h>
-#include <cmath>
-#include <string>
-#include <cstring>
-#include <climits>
-#include <sstream>
-#include <iomanip>
-#include <map>
-#include <stack>
-#include <tuple>
-#include <numeric>
-#include <assert.h>
-#include <functional>
-#include <unordered_map>
-#include <cstdint>
 
-using namespace std;
-
-/*-----------------------------------------------------------------------------
-　定義
- -------------------------------------------------------------------------------*/
-#define REP(i, n)				for (int (i) = 0 ; (i) < (int)(n) ; ++(i))
-#define REPN(i, m, n)			for (int (i) = m ; (i) < (int)(n) ; ++(i))
-#define INF						(int)2e9
-#define MOD						(1000 * 1000 * 1000 + 7)
-#define Ceil(x, n)				(((((x))+((n)-1))/n))		/* Nの倍数に切り上げ割り算 */
-#define CeilN(x, n)				(((((x))+((n)-1))/n)*n)		/* Nの倍数に切り上げ */
-#define FloorN(x, n)			((x)-(x)%(n))				/* Nの倍数に切り下げ */
-#define IsOdd(x)				(((x)&0x01UL) == 0x01UL)			
-#define IsEven(x)				(!IsOdd((x)))						
-#define	BitSetV(Val,Bit)		((Val) |= (Bit))			
-#define	BitTstV(Val,Bit)		((Val) & (Bit))				
-#define ArrayLength(x)			(sizeof( x ) / sizeof( x[ 0 ]))
-#define	MAX_QWORD				((QWORD)0xFFFFFFFFFFFFFFFF)
-#define M_PI					3.14159265358979323846
-typedef long long				ll;
-typedef unsigned long long int	QWORD;
-typedef unsigned long long		SQWORD;
-typedef pair<ll, ll>			P;
-
-/*-----------------------------------------------------------------------------
-　処理
- -------------------------------------------------------------------------------*/
 // 枝定義
 struct Edge
 {
 	int from;
 	int	to;
-	int	dist;
+	ll	dist;
 	Edge(){}
-	Edge(int from, int to, int dist): from(from), to(to), dist(dist){}
+	Edge(int from, int to, ll dist) : from(from), to(to), dist(dist){}
 };
 
 // ワーシャルフロイド
-template<class T>
 class WarshallFloyd
 {
 public:
 	// distList[i][j] = iからjまでの最短距離
-	vector<vector<T>> distList;
+	vector<vector<ll>> distList;
+	const ll inf = 1e14;
 
 public:
 	WarshallFloyd(int nodeNum, const vector<Edge> &edgeList)
 	{
-		distList.resize(nodeNum, vector<T>(edgeList.size(), (T)1e9));
-		for (auto edgeOne : edgeList) {
+		distList.resize(nodeNum, vector<ll>(nodeNum, inf));
+		for (const auto &edgeOne : edgeList) {
 			distList[edgeOne.from][edgeOne.to] = edgeOne.dist;
-			distList[edgeOne.to][edgeOne.from] = edgeOne.dist;
 		}
 
 		for (int nodeCnt = 0; nodeCnt < nodeNum; nodeCnt++) {
@@ -84,47 +35,37 @@ public:
 	}
 };
 
-
-int main()
+void Solve()
 {
 	// 入力
-	int N, M, R;
-	cin >> N >> M >> R;
-	
-	vector<int> pathList;
-	REP(i, R) {
-		int r;
-		cin >> r;
-		r--;
-		pathList.emplace_back(r);
-	}
+	int N;
+	cin >> N;
 
 	vector<Edge> edgeList;
-	REP(i, M) {
-		int a, b, c;
-		cin >> a >> b >> c;
-		a--, b--;
-		edgeList.emplace_back(Edge(a, b, c));
-		edgeList.emplace_back(Edge(b, a, c));
+	REP(i, N) {
+		string S;
+		cin >> S;
+		REP(j, N) {
+			if (S[j] == '1') {
+				edgeList.emplace_back(Edge(i, j, 1));
+			}
+		}
 	}
 
 	// ワーシャルフロイド
-	WarshallFloyd<int> res(N, edgeList);
+	WarshallFloyd res(N, edgeList);
 
-	// 順列
-	ll ans = INF;
-	sort(pathList.begin(), pathList.end());
-	do {
-		ll totalCost = 0;
-		int from = pathList[0];
-		for (int i = 1; i < pathList.size(); i++) {
-			int to = pathList[i];
-			totalCost += res.distList[from][to];
-			from = to;
+	double ans = 0;
+	REP(i, N) {
+		double attacker = 0;
+		REP(j, N) {
+			if (i == j) continue;
+			if (res.distList[j][i] != res.inf) {
+				attacker++;
+			}
 		}
-		ans = min(ans, totalCost);
-	} while (next_permutation(pathList.begin(), pathList.end()));
+		ans += 1 / (attacker + 1);
+	}
 
 	cout << ans << endl;
-	return 0;
 }
