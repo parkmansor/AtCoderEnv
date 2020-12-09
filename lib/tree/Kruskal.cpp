@@ -1,52 +1,3 @@
-#include "stdafx.h"
-#include <iostream>
-#include <set>
-#include <queue>
-#include <vector>
-#include <algorithm>
-#include <math.h>
-#include <cmath>
-#include <string>
-#include <cstring>
-#include <climits>
-#include <sstream>
-#include <iomanip>
-#include <map>
-#include <stack>
-#include <tuple>
-#include <numeric>
-#include <assert.h>
-#include <functional>
-#include <unordered_map>
-#include <cstdint>
-
-using namespace std;
-
-/*-----------------------------------------------------------------------------
-　定義
- -------------------------------------------------------------------------------*/
-#define REP(i, n)				for (int (i) = 0 ; (i) < (int)(n) ; ++(i))
-#define REPN(i, m, n)			for (int (i) = m ; (i) < (int)(n) ; ++(i))
-#define INF						(int)2e9
-#define MOD						(1000 * 1000 * 1000 + 7)
-#define Ceil(x, n)				(((((x))+((n)-1))/n))		/* Nの倍数に切り上げ割り算 */
-#define CeilN(x, n)				(((((x))+((n)-1))/n)*n)		/* Nの倍数に切り上げ */
-#define FloorN(x, n)			((x)-(x)%(n))				/* Nの倍数に切り下げ */
-#define IsOdd(x)				(((x)&0x01UL) == 0x01UL)			
-#define IsEven(x)				(!IsOdd((x)))						
-#define	BitSetV(Val,Bit)		((Val) |= (Bit))			
-#define	BitTstV(Val,Bit)		((Val) & (Bit))				
-#define ArrayLength(x)			(sizeof( x ) / sizeof( x[ 0 ]))
-#define	MAX_QWORD				((QWORD)0xFFFFFFFFFFFFFFFF)
-#define M_PI					3.14159265358979323846
-typedef long long				ll;
-typedef unsigned long long int	QWORD;
-typedef unsigned long long		SQWORD;
-typedef pair<ll, ll>			P;
-
-/*-----------------------------------------------------------------------------
-　処理
- -------------------------------------------------------------------------------*/
 template<class T>
 class UnionFind
 {
@@ -57,7 +8,7 @@ private:
 
 public:
 	// コンストラクタ
-	UnionFind(int n) 
+	UnionFind(int n)
 	{
 		parentNo.resize(n);
 		parentRank.resize(n, 0);
@@ -68,7 +19,7 @@ public:
 		}
 	}
 
-	int root(T x) 
+	int root(T x)
 	{
 		if (parentNo[x] == x) {
 			return x;
@@ -79,17 +30,17 @@ public:
 		}
 	}
 
-	bool same(T x, T y) 
+	bool same(T x, T y)
 	{
 		return root(x) == root(y);
 	}
 
-	int size(T x) 
+	int size(T x)
 	{
 		return parentSize[root(x)];
 	}
 
-	void unite(T xc, T yc) 
+	void unite(T xc, T yc)
 	{
 		T xr = root(xc);
 		T yr = root(yc);
@@ -116,19 +67,18 @@ struct Edge
 	int	to;
 	ll	cost;
 	Edge(){}
-	Edge(int from, int to, ll cost): from(from), to(to), cost(cost){}
+	Edge(int from, int to, ll cost) : from(from), to(to), cost(cost){}
 };
 
-bool distCmp(const Edge &a, const Edge &b) { return a.cost < b.cost; };
-
 // クラスカル
-ll Kruskal(int nodeNum, vector<Edge> edgeList)
+bool compMin(const Edge &a, const Edge &b) { return a.cost < b.cost; };
+ll Kruskal(int nodeNum, vector<Edge> &edgeList)
 {
 	ll totalCost = 0;
-	sort(edgeList.begin(), edgeList.end(), distCmp);
+	sort(edgeList.begin(), edgeList.end(), [](const Edge &a, const Edge &b) { return a.cost < b.cost; });
 
 	UnionFind<int> uFind(nodeNum);
-	for (auto edgeOne : edgeList) {
+	for (const auto &edgeOne : edgeList) {
 		if (!uFind.same(edgeOne.from, edgeOne.to)) {
 			uFind.unite(edgeOne.from, edgeOne.to);
 			totalCost += edgeOne.cost;
@@ -137,43 +87,35 @@ ll Kruskal(int nodeNum, vector<Edge> edgeList)
 	return totalCost;
 }
 
-int main()
+// 処理
+void Solve()
 {
-	// 入力
-	int N;
+	ll N;
 	cin >> N;
-	
-	vector<pair<ll, int>> xList;
-	vector<pair<ll, int>> yList;
+	vector<P> x(N);
+	vector<P> y(N);
+
 	REP(i, N) {
 		ll a, b;
 		cin >> a >> b;
-		xList.emplace_back(pair<ll, int>{a, i});
-		yList.emplace_back(pair<ll, int>{b, i});
+		x[i] = { a, i };
+		y[i] = { b, i };
 	}
-	sort(xList.begin(), xList.end());
-	sort(yList.begin(), yList.end());
+	sort(ALL(x));
+	sort(ALL(y));
 
-	vector<Edge> edgeList;
-	REP(i, N - 1) {
-		ll cost;
-		int from, to;
-		pair<ll, int> *pList;
-		pList = &xList[i];
-		cost = abs(pList[1].first - pList[0].first);
-		to = pList[1].second;
-		from = pList[0].second;
-		edgeList.emplace_back(Edge{from, to, cost});
+	vector<Edge> edge;
+	auto makeEdge = [&](vector<P> &p) {
+		REP(i, N - 1) {
+			auto p1 = p[i];
+			auto p2 = p[i + 1];
+			ll cost = p2.first - p1.first;
+			edge.emplace_back(Edge(p1.second, p2.second, cost));
+		}
+	};
+	makeEdge(x);
+	makeEdge(y);
 
-		pList = &yList[i];
-		cost = abs(pList[1].first - pList[0].first);
-		to = pList[1].second;
-		from = pList[0].second;
-		edgeList.emplace_back(Edge{from, to, cost});
-	}
-
-	// クラスカル
-	ll ans = Kruskal(N, edgeList);
+	ll ans = Kruskal(N, edge);
 	cout << ans << endl;
-	return 0;
 }
