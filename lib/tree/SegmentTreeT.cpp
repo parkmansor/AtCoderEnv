@@ -1,66 +1,3 @@
-#include "stdafx.h"
-#include <iostream>
-#include <set>
-#include <queue>
-#include <vector>
-#include <algorithm>
-#include <math.h>
-#include <cmath>
-#include <string>
-#include <cstring>
-#include <functional>
-#include <climits>
-#include <sstream>
-#include <iomanip>
-#include <map>
-#include <stack>
-#include <tuple>
-#include <numeric>
-#include <assert.h>
-#include <functional>
-
-using namespace std;
-
-/*-----------------------------------------------------------------------------
-　定義
- -------------------------------------------------------------------------------*/
-#define REP(i, n)				for (int (i) = 0 ; (i) < (int)(n) ; ++(i))
-#define REPN(i, m, n)			for (int (i) = m ; (i) < (int)(n) ; ++(i))
-#define INF						2e9
-#define MOD						(1000 * 1000 * 1000 + 7)
-#define Ceil(x, n)				(((((x))+((n)-1))/n))		/* Nの倍数に切り上げ割り算 */
-#define CeilN(x, n)				(((((x))+((n)-1))/n)*n)		/* Nの倍数に切り上げ */
-#define FloorN(x, n)			((x)-(x)%(n))				/* Nの倍数に切り下げ */
-#define IsOdd(x)				(((x)&0x01UL) == 0x01UL)			
-#define IsEven(x)				(!IsOdd((x)))						
-#define	BitSetV(Val,Bit)		((Val) |= (Bit))			
-#define	BitTstV(Val,Bit)		((Val) & (Bit))				
-#define ArrayLength(x)			(sizeof( x ) / sizeof( x[ 0 ]))
-#define MAX_DWORD				(0xFFFFFFFF)
-#define	MAX_SDWORD				((SDWORD)0x7FFFFFFF)
-#define	MIN_SDWORD				((SDWORD)0x80000000)
-#define	MAX_QWORD				((QWORD)0xFFFFFFFFFFFFFFFF)
-#define	MIN_QWORD				((QWORD)0x0000000000000000)
-#define	MAX_SQWORD				((SQWORD)0x7FFFFFFFFFFFFFFF)
-#define	MIN_SQWORD				((SQWORD)0x8000000000000000)
-#define M_PI					3.14159265358979323846
-
-typedef long					SDWORD;
-typedef long long				SQWORD;
-typedef unsigned long			DWORD;
-typedef unsigned long long int	QWORD;
-typedef long long ll;
-typedef pair<double, double>	P;
-
-/*-----------------------------------------------------------------------------
-　処理
- -------------------------------------------------------------------------------*/
-#define N_MAX	(200 * 1000)
-#define K_MAX	(10)
-#define M_MAX	(10)
-#define Q_MAX	(10)
-#define H_MAX	(1000)
-#define W_MAX	(1000)
 
 // セグメントツリー
 template <typename T>
@@ -72,10 +9,16 @@ private:
 	function<T(T, T)> joinExec;
 
 public:
-	SegmentTree(int K, function<T(T, T)> arg) : joinExec(arg)
+	SegmentTree(int N, function<T(T, T)> arg) : joinExec(arg)
 	{
-		data.resize(1 << K, P(1, 0));
-		segDataMax = 1 << (K - 1);
+		ll shiftVal = 1;
+		ll shiftNum = 1;
+		while (shiftVal < N) {
+			shiftVal *= 2;
+			shiftNum++;
+		}
+		data.resize((ll)1 << shiftNum, T(1, 0));
+		segDataMax = (ll)1 << (shiftNum - 1);
 	}
 
 	void Add(int index, T addData)
@@ -100,11 +43,11 @@ public:
 	}
 
 	// セグメントツリーからデータ取得
-	T GetRangeData(int dataSt, int dataEnd, int nodeNo, int rangeL, int rangeR)
+	T GetRangeData(int dataSt, int dataEnd, int nodeNo = 0, int rangeL = 0, int rangeR = -1)
 	{
 		// この範囲にはない
 		if ((dataEnd <= rangeL) || (rangeR <= dataSt)) {
-			return P(0, 0);
+			return T(0, 0);
 		}
 
 		// 範囲に入ってる
@@ -128,56 +71,60 @@ public:
 	}
 };
 
-P joinSegTree(const P &left, const P &right)
+// ベクターを値とインデックスのマップに圧縮
+template <class T>
+map<T, int> compressVectorToMap(vector<T> vect)
 {
-	P	joinRes;
-	joinRes.first = left.first * right.first;
-	joinRes.second = left.second * right.first + right.second;
-	return joinRes;
+	int cmpIdx = 0;
+	map<T, int> idxTblMap;
+
+	// 重複削除
+	sort(vect.begin(), vect.end());
+	vect.erase(unique(vect.begin(), vect.end()), vect.end());
+
+	// 昇順にインデックスを割り当て
+	for (auto one : vect) {
+		idxTblMap[one] = cmpIdx;
+		cmpIdx++;
+	}
+
+	return idxTblMap;
 }
 
-struct ParamInfo {
-	ll	boxNo;
-	P	param;
-};
-
-int main()
+typedef pair<double, double>   PD;
+void Solve()
 {
-	ll N;
-	int M;
+	ll N, M;
 	cin >> N >> M;
-	vector<ll> boxNoList;
-	vector<ParamInfo> paramList;
-	REP(i, M) {
-		ParamInfo paramOne;
-		cin >> paramOne.boxNo >> paramOne.param.first >> paramOne.param.second;
-		paramList.push_back(paramOne);
-		boxNoList.push_back(paramOne.boxNo);
-	}
+	VL P(M);
+	vector<PD> ab(M);
+	REP(i, M) cin >> P[i] >> ab[i].first >> ab[i].second, P[i]--;
+	
+	map<ll, int> no2idx = compressVectorToMap<ll>(P);
 
-	// 箱の番号をインデックスに圧縮
-	int idx = 0;
-	sort(boxNoList.begin(), boxNoList.end());
-	boxNoList.erase(unique(boxNoList.begin(), boxNoList.end()), boxNoList.end());
-	map<ll, int> boxNoToIdx;
-	for (auto boxNoOne : boxNoList) {
-		boxNoToIdx[boxNoOne] = idx;
-		idx++;
-	}
+	// r[i + 1] = a[i] * r[i] + b[i] 
+	// r[i + 2] = a[i + 1] * r[i + 1] + b[i + 1] 
+	// r[i + 2] = a[i + 1] * a[i] * r[i] + a[i + 1] * b[i] + b[i + 1] 
+	auto join = [](const PD &left, const PD &right)
+	{
+		PD	res;
+		res.first = left.first * right.first;
+		res.second = left.second * right.first + right.second;
+		return res;
+	};
 
-	// 一個づつ更新
-	double ansMax = 1;
 	double ansMin = 1;
-	SegmentTree<P> segTree(18, joinSegTree);
-	for (auto paramOne : paramList) {
-		idx = boxNoToIdx[paramOne.boxNo];
-		segTree.Add(idx, paramOne.param);
-		P param = segTree.GetAllRangeData();
-		double nowRes = param.first + param.second;
-		ansMax = max(nowRes, ansMax);
-		ansMin = min(nowRes, ansMin);
+	double ansMax = 1;
+	SegmentTree<PD> segTree((int)no2idx.size(), join);
+	REP(i, M) {
+		ll idx = no2idx[P[i]];
+		segTree.Add(idx, ab[i]);
+		PD allParam = segTree.GetAllRangeData();
+		double ansOne = allParam.first + allParam.second;
+		ansMin = min(ansOne, ansMin);
+		ansMax = max(ansOne, ansMax);
 	}
-	printf("%lf\n", ansMin);
-	printf("%lf\n", ansMax);
-	return 0;
+
+	cout << ansMin << endl;
+	cout << ansMax << endl;
 }
